@@ -30,7 +30,8 @@ mat2 = np.random.randint(low=1, high=11, size=(4, 3))
 
 # stack a long vector into matrix in a specific way
 longvec = np.random.randint(low=1, high=11, size=40)
-np.reshape(a=longvec, order=0, )
+longvec2 = np.reshape(a=longvec, order='C', newshape=(5, 8)) # stack elements of longvec into rows
+longvec3 = np.reshape(a=longvec, order='F', newshape=(5, 8)) # stack elements of longvec into columns
 
 ### 2. matrices multiplication
 mat3 = np.dot(a=mat1, b=mat2)
@@ -45,4 +46,16 @@ mat_test = np.random.randint(low=-10, high=11, size=(4, 4))
 
 
 ### 4. Hadamard product (elementwise multiplication)
- np.multiply(x1=, x2=)
+first_vec = np.random.randint(low=1, high=11, size=20)
+first_mat = np.reshape(a=first_vec, order="C", newshape=(5, 4))
+second_vec = np.random.randint(low=1, high=11, size=20)
+second_mat = np.reshape(a=second_vec, order="F", newshape=(5, 4))
+had_res = np.multiply(first_mat, second_mat) # element-by-element multiplication
+
+### 5. Creating a matrix of ones
+mat_ones = np.ones(shape=(5, 5))
+
+### 6. Creating a diagonal matrix from a vector (its elements are put on the diagonal)
+mat_diag = np.diag(v=np.ones(shape=6))
+
+### 7.
