@@ -157,3 +157,9 @@ print(gun1.loaded)
 
 gun1.__class__.__dict__["load"] # get the method from the class of object gun1
 gun1.__class__.__dict__["load"].__get__(gun1) # use the __get__ method and pass gun1 object to it
+
+
+#######################################
+##### 4. When Methods Met Classes #####
+#######################################
+
