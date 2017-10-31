@@ -58,4 +58,12 @@ mat_ones = np.ones(shape=(5, 5))
 ### 6. Creating a diagonal matrix from a vector (its elements are put on the diagonal)
 mat_diag = np.diag(v=np.ones(shape=6))
 
-### 7.
+### 7. numpy.squeeze
+vec1 = np.random.randn(100)
+vec1 = vec1.reshape(100, 1)
+vec2 = np.squeeze(vec1, axis=1)
+print(vec2.shape)
+vec3 = vec1.reshape(1, 100)
+vec4 = np.squeeze(vec3, axis=0)
+print(vec4.shape)
+# Note: the final result of squeezing both: (1, 100) and (100, 1) arrays is the same
