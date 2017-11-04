@@ -3,6 +3,18 @@
 
 import string
 
+# -------------------------------------------------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------------------------------------------------- #
+# ------------------------      SOME RELEVANT DEFINITIONS OF CONCEPTS BEING USED      -------------------------------- #
+# -------------------------------------------------------------------------------------------------------------------- #
+# Iterable - object that has __iter__ method that returns an iterator
+# In other words, iterable is an object from which an iterator can be obtained
+#
+# Iterator - object that has __next__ method defined
+#
+# -------------------------------------------------------------------------------------------------------------------- #
+
+
 # 1.
 # iterating over a list
 for item in ["a", "aa", 1, 32, 12, "qwe"]:
@@ -34,7 +46,8 @@ while True:
         break
 
 
-# Formally, what makes a class iterable is having implementation of __iter__() and __next__() methods
+# Formally, what makes a class iterable is having implementation of __iter__() method.
+# What makes a class iterator is having implementation of __next__() method.
 # Cf. the example below:
 class MyIteratorClass:
     """
@@ -52,8 +65,8 @@ class MyIteratorClass:
 
     def __iter__(self):
         """
-        This is the implementation of the __iter__ method required by the iteration protocol.
-        Here, it simply returns the object. It needs not be always the case, cf. below
+        This is the implementation of the __iter__ method of the iteration protocol.
+        Here, it simply returns the object. It needs not be always the case, cf. next example below.
         :return: itself
         """
         return self
@@ -75,3 +88,37 @@ test_obj = MyIteratorClass(n=10)
 for item in test_obj:
     print(item)
 
+
+# 3. Example of case when iterable and iterator are not the same thing
+
+
+class MyIteratorClassOdd:
+    """
+    This class is an iterator: it has __next__ method implementation
+    """
+    def __init__(self, n):
+        self.max_iter = n
+        self.iter_status = 0
+
+    def __next__(self):
+        if self.iter_status < self.max_iter:
+            self.iter_status += 1
+            return 2*(self.iter_status-1) + 1
+        else:
+            raise StopIteration("StopIteration exception is raised from the MyIteratorClassOdd instance!")
+
+
+class MyIterableClassOdd:
+    """
+    This class is an iterable: it defines the __iter__ method, but does NOT define its own __next__ method
+    """
+    def __init__(self, n):
+        self.max_iter = n
+
+    def __iter__(self):
+        return MyIteratorClassOdd(n=self.max_iter)
+
+
+test_obj2 = MyIterableClassOdd(10)
+for el in test_obj2:
+    print(el)
