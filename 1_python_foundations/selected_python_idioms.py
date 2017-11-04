@@ -19,4 +19,14 @@ print(list(my_dict.keys())) # list of dictionary keys
 print(list(my_dict.values())) # list of dictionary values
 print(list(my_dict.items())) # list of tuples that are (key, value) pairs
 
-# 3.
+# 3. Joining strings
+# 3.1. First, the wrong way
+list_of_strings = ["THIS", "IS", "SPARTAAAA", "!!!!!!"]
+leonidas_quote = ""
+for word in list_of_strings:
+    leonidas_quote += " "
+    leonidas_quote += word
+print(leonidas_quote)
+# 3.2. Now, the elegant way
+leonidas_quote = " ".join(list_of_strings)
+print(leonidas_quote)
