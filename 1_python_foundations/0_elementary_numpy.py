@@ -67,3 +67,8 @@ vec3 = vec1.reshape(1, 100)
 vec4 = np.squeeze(vec3, axis=0)
 print(vec4.shape)
 # Note: the final result of squeezing both: (1, 100) and (100, 1) arrays is the same
+
+### 8. numpy's outer function
+vec1 = np.array([1, 2, 3, 4, 5])
+vec2 = np.array([0, 1, 2, 3])
+out = np.outer(a=vec1, b=vec2)
