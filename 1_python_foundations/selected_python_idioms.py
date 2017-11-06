@@ -64,4 +64,9 @@ list_of_tuples = list(itertools.product(group1, group2, group3))
 test_dict = {}
 for (el1, el2, el3) in list_of_tuples:
     test_dict[el1] = test_dict.get(el1, 0) + el2*el3
-    
+
+# 6. merging two dictionaries in Python
+dict1 = {"a": 12, "b": 32}
+dict2 = {"b": 22, "c": 111}
+overwrite_first = {**dict1, **dict2}
+overwrite_second = {**dict2, **dict1}
