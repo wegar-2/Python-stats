@@ -3,7 +3,7 @@
 
 import math
 import pickle
-
+import os
 
 # 0. define exceptions that will be used later on
 class NotInteger(Exception):
@@ -66,6 +66,7 @@ def select_primes_from_list(list_in):
             print("General error in select_primes_from_list!")
     return primes_list
 
+
 test_list = list(range(0, 20))
 print(test_list)
 print(select_primes_from_list(test_list))
@@ -73,7 +74,17 @@ print(select_primes_from_list(test_list))
 # 2. Now, for the purpose of illustration, create a very big list of consecutive integers and show that if the size
 # gets bigger it becomes problematic to work with such objects
 list_of_integers = list()
-for iter in range(100000000):
-    list_of_integers.append(iter)
+for item in range(100000000):
+    list_of_integers.append(item)
 
+# save the list into a file in current directory
+print("Current working directory: ", os.getcwd())
+file_path = os.path.join(os.getcwd(), "big_list.p")
+file1 = open(file=file_path, mode="wb")
+pickle.dump(obj=list_of_integers, file=file1)
+file1.close()
+del list_of_integers
 
+# in this setting, looking for consecutive numbers requires creation of big arrays of integers
+
+# 3.
