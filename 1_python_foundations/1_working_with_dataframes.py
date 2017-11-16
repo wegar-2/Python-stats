@@ -2,8 +2,8 @@
 # 0. libraries' imports
 import numpy as np
 import pandas as pd
-# import sys
-# import os
+import sys
+import os
 import string
 # import random
 import itertools
@@ -159,12 +159,52 @@ print(df_test.xs("Germany", axis=0, level=1))
 print(df_test.xs("5", axis=0, level=0))
 
 
-# 4.4. sorting a DataFrame with a MultiIndex
+# ----------------------------------------------------------------------------------------------------------------------
+# 5. sorting a DataFrame with a MultiIndex
 
-# 4.4.1. preliminaries: sorting a DataFrame with one-level index only
 
-# 4.4.2. sorting a DataFrame with MultiIndexes
+# 5.1. preliminaries: sorting a DataFrame with one-level index only
+df1 = pd.read_csv(filepath_or_buffer=os.path.join(os.getcwd(), "data", "ng_f_d.csv"), sep=",", index_col=[0])
+# 5.1.1. sidenote: sampling from a pandas.DataFrame
+df2 = df1.sample(n=1000, axis=0, replace=False)
+
+# 5.2. sort by index
+df3 = df2.sort_index(axis=0, level=0)
+
+# 5.3. sort by a column
+df4 = df2.sort_values(by=["Zamkniecie"], ascending=[1])
+print(df4.head(5))
+print(df4.tail(5))
+
+
+# 5.2. sorting a DataFrame with MultiIndexes
+list1 = [str(el) for el in list(string.ascii_lowercase[0:10])]
+list2 = ["group_" + str(k+1) for k in range(4)]
+mi_r = pd.MultiIndex.from_product(iterables=(list2, list1),
+                                  names=["group", "subgroup"])
+mi_c = pd.MultiIndex.from_product(iterables=(("X", "Y"), ("country_1", "country_2", "country_3")),
+                                  names=["category", "country"])
+df_with_mi = pd.DataFrame(data=np.random.gamma(shape=5, scale=5, size=[40, 6]),
+                          columns=mi_c, index=mi_r)
+print(df_with_mi)
+# 5.2. sorting in groups on the first level of columns
+df_s1 = df_with_mi.sort_index(by=("X", "country_1"), ascending=False)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# 5.
+# 6. Walk through some useful (in the context of MultiIndexes on DataFrames) pandas functions
+list1 = ["a", "b"]
+list2 = ["subgroup_" + str(el+1) for el in range(10)]
+mi_r = pd.MultiIndex.from_product(iterables=(list1, list2), names=["letter", "subgroup"])
+list1 = ["a", "b"]
+list2 = ["subgroup_1", "subgroup_2"]
+mi_c = pd.MultiIndex.from_product(iterables=(list1, list2), names=[])
+df_test = pd.DataFrame(data=np.random.randn(20, 4), columns=mi_c, index=mi_r)
+
+# 6.1. pandas.DataFrame.reset_index
+
+
+# 6.2. pandas.DataFrame.sort_index
+
+
+# 6.3.pandas.DataFrame.sort_values
