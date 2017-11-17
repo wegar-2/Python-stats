@@ -198,13 +198,72 @@ list2 = ["subgroup_" + str(el+1) for el in range(10)]
 mi_r = pd.MultiIndex.from_product(iterables=(list1, list2), names=["letter", "subgroup"])
 list1 = ["a", "b"]
 list2 = ["subgroup_1", "subgroup_2"]
-mi_c = pd.MultiIndex.from_product(iterables=(list1, list2), names=[])
+mi_c = pd.MultiIndex.from_product(iterables=(list1, list2), names=["level_1", "level_2"])
 df_test = pd.DataFrame(data=np.random.randn(20, 4), columns=mi_c, index=mi_r)
+# 6.0.1. Sidenote: swapping indexes
+my_cmi = pd.MultiIndex.from_product(iterables=(["a", "b"], ["Q", "P"]), names=["col_lev_1", "col_lev_2"])
+my_rmi = pd.MultiIndex.from_product(iterables=(["A", "B"], ["X", "Y", "Z", "U"]), names=["row_lev_1", "row_lev_2"])
+my_df = pd.DataFrame(data=np.random.randn(8, 4), columns=my_cmi, index=my_rmi)
+# swap MultiIndex on columns
+my_df_c = my_df.swaplevel(axis=0, i=0, j=1)
+my_df_c.sort_index(level=0, axis=0, inplace=True)
+# swapMultiIndex on rows
+my_df_r = my_df.swaplevel(axis=1, i=0, j=1)
+my_df_r.sort_index(level="col_lev_2", axis=1, inplace=True)
+# NOTE: remeber to apply the sort_index function on a DataFrame to order the indexes
+
 
 # 6.1. pandas.DataFrame.reset_index
+# 6.1.1. dropping all levels of indexes
+df_test2 = df_test.reset_index(level=["letter", "subgroup"], inplace=False, drop=False)
+# 6.1.2. dropping one level of indexes
+df_test3 = df_test.reset_index(level="letter", inplace=False, drop=False)
 
 
-# 6.2. pandas.DataFrame.sort_index
+# 6.2. pandas.DataFrame.sort_index: as mentioned earlier, sort_index is used to sort MultiIndex on columns or rows at
+#  one of the MultiIndex levels
+df_test = df_test.columns.droplevel(level=0)
+df_test4 = df_test.copy()
+df_test4.columns = df_test4.columns.droplevel(level=0)
 
 
-# 6.3.pandas.DataFrame.sort_values
+# 6.4. pandas.DataFrame.sort_values
+col_mi = pd.MultiIndex.from_product(iterables=(["A", "B"], ["x", "y"]))
+row_mi = pd.MultiIndex.from_product(iterables=(["Germany", "France"], ["a", "b", "c", "d", "e"]))
+df_ung = pd.DataFrame(data=np.random.randn(10, 4), index=row_mi, columns=col_mi)
+# sorting
+df_ung.sort_values(by=("A", "x"))
+
+
+# 6.3.pandas.DataFrame.groupby
+# 6.3.1. sort by a column in subgroups
+my_letters = np.random.choice(a=["a", "b", "c"], p=[0.25, 0.25, 0.5], replace=True, size=1000)
+my_letters = pd.DataFrame(data={"col1": my_letters})
+gp1 = my_letters.groupby(by="col1")
+gp1.size()
+# 6.3.2.
+data1 = np.random.randn(1000, 4)
+data2 = np.random.choice(a=["a", "b", "c", "d"], p=[0.5, 0.2, 0.2, 0.1], replace=True, size=1000).reshape(1000, 1)
+data3 = np.concatenate((data1, data2), axis=1)
+array1 = np.array(["my_group", "A", "A", "B", "B"])
+array2 = np.array(["my_group", "X", "X", "Y", "Y"])
+mi_c = pd.MultiIndex.from_arrays(arrays=(array1, array2), names=[])
+tuple_1 = tuple(string.ascii_lowercase[0:20])
+tuple_2 = tuple([str(k+1) for k in range(50)])
+mi_r = pd.MultiIndex.from_product(iterables=(tuple_1, tuple_2), names=[])
+df1 = pd.DataFrame(data=data3, columns=mi_c, index=mi_r)
+df2 = df1.reset_index(level=[0, 1], inplace=False, drop=False)
+df2.head(10)
+gpd1 = df2.groupby(by="level_0")
+sorted1 = gpd1.sort_values(by=["A", "X"])
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 7. Pivoting DataFrames
+
+
+# 7.1. Pivoting data frame with one-level index
+
+
+# 7.2. Pivoting data frame with multi-level indexes
+
+
