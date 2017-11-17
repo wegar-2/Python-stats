@@ -235,13 +235,13 @@ df_ung = pd.DataFrame(data=np.random.randn(10, 4), index=row_mi, columns=col_mi)
 df_ung.sort_values(by=("A", "x"))
 
 
-# 6.3.pandas.DataFrame.groupby
-# 6.3.1. sort by a column in subgroups
+# 6.4. pandas.DataFrame.groupby
+# 6.4.1. sort by a column in subgroups
 my_letters = np.random.choice(a=["a", "b", "c"], p=[0.25, 0.25, 0.5], replace=True, size=1000)
 my_letters = pd.DataFrame(data={"col1": my_letters})
 gp1 = my_letters.groupby(by="col1")
 gp1.size()
-# 6.3.2.
+# 6.4.2.
 data1 = np.random.randn(1000, 4)
 data2 = np.random.choice(a=["a", "b", "c", "d"], p=[0.5, 0.2, 0.2, 0.1], replace=True, size=1000).reshape(1000, 1)
 data3 = np.concatenate((data1, data2), axis=1)
@@ -257,6 +257,23 @@ df2.head(10)
 gpd1 = df2.groupby(by="level_0")
 sorted1 = gpd1.sort_values(by=["A", "X"])
 
+
+# 6.5.
+list1 = list(string.ascii_lowercase[0:5])
+list2 = ["X", "Y"]
+mi_r = pd.MultiIndex.from_product(iterables=(list2, list1),
+                                  names=["ho_group", "lo_group"])
+mi_c = pd.MultiIndex.from_product(iterables=(["A", "B"], ["X", "Y"]),
+                                  names=["early_letters", "late_letters"])
+my_df = pd.DataFrame(data=np.random.randn(10, 4),
+                     columns=mi_c, index=mi_r)
+my_df.reset_index(level=[0,1], drop=False, inplace=True)
+# sort in descending order
+my_df.sort_values(by=[("ho_group", ""), ("A", "X")], ascending=[0, 0])
+# recover the index
+my_df_2 = my_df.set_index(["ho_group", "lo_group"])
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # 7. Pivoting DataFrames
 
@@ -267,3 +284,51 @@ sorted1 = gpd1.sort_values(by=["A", "X"])
 # 7.2. Pivoting data frame with multi-level indexes
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# 8. Putting all of the above stuff into practice together
+
+
+# 8.1. load the time series and prepare the data set
+# 8.1.1. read into the DataFrames
+data_dir = os.path.join(os.getcwd(), "data")
+df_oil = pd.read_csv(filepath_or_buffer=os.path.join(data_dir, "cl_f_d.csv"))
+df_gas = pd.read_csv(filepath_or_buffer=os.path.join(data_dir, "ng_f_d.csv"))
+df_spx = pd.read_csv(filepath_or_buffer=os.path.join(data_dir, "^spx_d.csv"))
+df_wig20 = pd.read_csv(filepath_or_buffer=os.path.join(data_dir, "wig20_d.csv"))
+# 8.1.2. take only the common columns and rename columns
+print(df_oil.columns)
+print(df_gas.columns)
+print(df_spx.columns)
+print(df_wig20.columns)
+my_columns = list(set(df_oil.columns) & set(df_gas.columns) & set(df_spx.columns) & set(df_wig20.columns))
+new_colnames = ["close", "high", "low", "open", "date", "volume"]
+dict_newnames = dict(zip(my_columns, new_colnames))
+df_oil = df_oil.loc[:, my_columns].rename(columns=dict_newnames)
+df_gas = df_gas.loc[:, my_columns].rename(columns=dict_newnames)
+df_spx = df_spx.loc[:, my_columns].rename(columns=dict_newnames)
+df_wig20 = df_wig20.loc[:, my_columns].rename(columns=dict_newnames)
+# 8.1.3. drop current date observations (might be incomplete)
+curdate = pd.Timestamp("2017-11-17")
+df_oil = df_oil[df_oil["date"] != curdate]
+df_gas = df_gas[df_gas["date"] != curdate]
+df_spx = df_spx[df_spx["date"] != curdate]
+df_wig20 = df_wig20[df_wig20["date"] != curdate]
+# 8.1.4. Concatenate the data vertically
+df_final = pd.concat((df_oil, df_gas, df_spx, df_wig20),
+                     axis=0, keys=["oil", "gas", "spx", "wig20"], names=["asset"])
+df_final = df_final.reset_index(level=0, drop=False, inplace=False)
+df_final.sort_values(by=["asset", "date"], inplace=True)
+# make sure that the data is nicely sorted
+df_final.index = pd.MultiIndex.from_arrays(arrays=(list(df_final.loc[:, "asset"]),
+                                                   list(df_final.loc[:, "date"])),
+                                           names=["asset", "date"])
+df_final.drop(["date", "asset"], axis=1, inplace=True)
+print(df_final.head(10))
+
+
+# 8.2. save the data
+
+
+# 8.3. pivot the data
+
+# 8.4. calculate the opening-EoD spreads
