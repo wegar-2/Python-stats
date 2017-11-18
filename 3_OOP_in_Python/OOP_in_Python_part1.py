@@ -19,6 +19,9 @@ class BigCar(Car):
         super().__init__()
         print("Class")
 
+    # SIDENOTE on @staticmethod: transforms a function into a static method.
+    # A static method does not receive an implicit first argument. It can be called on
+    # both: class instances and on the class itself
     @staticmethod
     def make_loud_sound():
         print("Wrroooom, Wrroooom, Wrroooom!!!")
@@ -40,7 +43,7 @@ type(car1.__class__) # get type of "Car" ===> "type"
 
 
 ###########################################################################
-# A walkthrough through the "Python 3 OOP Part 2 - Classes and members"   #
+# A walk through the "Python 3 OOP Part 2 - Classes and members"          #
 # article from http://blog.thedigitalcatonline.com/blog/2014/08/20/       #
 # python-3-oop-part-2-classes-and-members/#.WeNxfnCxVjU                   #
 # by Leonardo Giordani                                                    #
@@ -98,6 +101,7 @@ class Car2:
     def __init__(self, make):
         print("Class 'Car2' constructor called!")
         self.make = make
+
 
 car2 = Car2(make="Porsche")
 car3 = Car2(make="Mercedes")
