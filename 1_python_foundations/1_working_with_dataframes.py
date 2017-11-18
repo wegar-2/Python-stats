@@ -301,8 +301,9 @@ print(df_gas.columns)
 print(df_spx.columns)
 print(df_wig20.columns)
 my_columns = list(set(df_oil.columns) & set(df_gas.columns) & set(df_spx.columns) & set(df_wig20.columns))
-new_colnames = ["close", "high", "low", "open", "date", "volume"]
-dict_newnames = dict(zip(my_columns, new_colnames))
+old_colnames = sorted(my_columns)
+new_colnames = ["date", "low", "high", "open", "volume", "close"]
+dict_newnames = dict(zip(old_colnames, new_colnames))
 df_oil = df_oil.loc[:, my_columns].rename(columns=dict_newnames)
 df_gas = df_gas.loc[:, my_columns].rename(columns=dict_newnames)
 df_spx = df_spx.loc[:, my_columns].rename(columns=dict_newnames)
@@ -327,8 +328,30 @@ print(df_final.head(10))
 
 
 # 8.2. save the data
+df_final.to_csv(os.path.join(data_dir, "final_data.csv"))
+
+# 8.3. pivot the data: note that in here the same index (a particular date) does not have to appear in all the
+# subgroups (here: assets)
+df_final_piv = df_final.reset_index(level=[0, 1], drop=False, inplace=False)
+print(df_final_piv.head(3))
+df_pivtd = pd.pivot_table(data=df_final_piv, index="date",
+                          columns="asset", )
+print(df_pivtd.head(3)) # NaNs are treated as expected
+df_pivtd = df_pivtd.swaplevel(axis=1, i=0, j=1)
+df_pivtd = df_pivtd.sort_index(level=0, axis=1)
+print(df_pivtd.head(3))
 
 
-# 8.3. pivot the data
+# 8.4. calculate the opening-EoD spreads: for now this is done looping over the values of the first
+# level of columns' index
+# 8.4.1. get assets' names
+assets_names = list(set(df_pivtd.columns.get_level_values(level=0)))
+# 8.4.2. iterate over the assets and add open-close spread foreach of them
+for asset_name in assets_names:
+    df_pivtd.loc[:, (asset_name, "session_change")] = df_pivtd.loc[:, (asset_name, "close")] - \
+                                                      df_pivtd.loc[:, (asset_name, "open")]
+df_pivtd.sort_index(axis=1, level=0, inplace=True)
+df_pivtd.head(3)
 
-# 8.4. calculate the opening-EoD spreads
+# ----------------------------------------------------------------------------------------------------------------------
+# 9.
