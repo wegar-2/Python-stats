@@ -41,3 +41,37 @@ class StockOption(GeneralFinancialInstrument):
     def calculate_value_at_risk(self):
         print("Method calculate_value_at_risk of StockOption class called. ")
 
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 3. Note on the usage of metaclasses in the context of Abstract Base Classes
+class MyTestAbc(object):
+    # one of the two ways to set class' metaclass is using __metaclass__ as presented below
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self):
+        pass
+
+    @abc.abstractmethod
+    def mandatory_child_method(self):
+        pass
+
+
+class MyChildClass(MyTestAbc):
+
+    def __init__(self):
+        super().__init__() # call to the constructor of parent class
+
+    def mandatory_child_method(self):
+        print("Inside mandatory_child_method method of MyChildClass' class!")
+
+
+# another way to set a class' metaclass is through using 'metaclass' argument of the class' name
+class MyAnotherTestAbc(object, metaclass=abc.ABCMeta):
+
+    def __init__(self):
+        pass
+
+    @abc.abstractmethod
+    def my_method(self):
+        pass
+
