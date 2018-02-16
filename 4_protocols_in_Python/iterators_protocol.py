@@ -12,10 +12,16 @@ import string
 #
 # Iterator - object that has __next__ method defined
 #
+# Iterator protocol - protocol that consists of two methods:
+#   1) __iter__
+#   2) __next__
+#
+# It should be stressed that we are dealing with three separate concepts here:
+#   1) iterable
+#   2) iterator
+#   3) iterator protocol
 # -------------------------------------------------------------------------------------------------------------------- #
 
-
-# 1.
 # iterating over a list
 for item in ["a", "aa", 1, 32, 12, "qwe"]:
     print(item)
@@ -48,6 +54,15 @@ while True:
 
 # Formally, what makes a class iterable is having implementation of __iter__() method.
 # What makes a class iterator is having implementation of __next__() method.
+#
+# Please note that:
+#   1) iterator protocol
+#   2) iterable
+#   3) iterator
+#
+#
+# Are three different concepts.
+#
 # Cf. the example below:
 class MyIteratorClass:
     """
@@ -89,7 +104,7 @@ for item in test_obj:
     print(item)
 
 
-# 3. Example of case when iterable and iterator are not the same thing
+# 3. Example of the point when iterable and iterator are not the same thing
 
 
 class MyIteratorClassOdd:
@@ -116,6 +131,12 @@ class MyIterableClassOdd:
         self.max_iter = n
 
     def __iter__(self):
+        """
+        This is method of class MyIterableClassOdd. The class is not iterator - it does not have an __iter__ method
+        defined. However, the class is an iterable because it has the __iter__ method implemented.
+        Please note that the
+        :return:
+        """
         return MyIteratorClassOdd(n=self.max_iter)
 
 
