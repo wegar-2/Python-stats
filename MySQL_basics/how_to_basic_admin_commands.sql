@@ -32,3 +32,10 @@ GRANT ALL PRIVILEGES ON DATABASE_NAME.* TO 'the_user'@'localhost';
 
 REVOKE SELECT, INSERT ON DATABASE_NAME.TABLE_NAME FROM 'the_user'@'localhost';
 
+
+### 10. Creating database my_database
+
+CREATE DATABASE my_database;
+
+
+### 11. 
