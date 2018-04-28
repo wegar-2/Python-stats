@@ -2,11 +2,11 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # WALK THROUGH THE TUTORIAL: http://hamelg.blogspot.com/2015/11/python-for-data-analysis-part-19_17.html
 # ----------------------------------------------------------------------------------------------------------------------
-
 import pandas as pd
 import numpy as np
 import os
 import string
+import datetime
 
 # ----------------------------------------------------------------------------------------------------------------------
 data1 = pd.read_csv(filepath_or_buffer=os.path.join(os.getcwd(), "data", "train.csv"))
@@ -53,7 +53,46 @@ df5.head()
 tab2 = pd.crosstab(index=df5.loc[:, "var_name_col"], columns=df5.loc[:, "group"])
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# working with dates and time series -----------------------------------------------------------------------------------
+start_date = datetime.date(year=2001, month=1, day=1)
+end_date = datetime.date(year=2015, month=12, day=31)
+
+timestamp_start = pd.Timestamp(start_date)
+timestamp_end = pd.Timestamp(end_date)
+
+# data range - daily frequency
+dr_daily = pd.date_range(start=timestamp_start, end=end_date, freq="D")
+
+# data range - business day frequency
+dr_business_day = pd.date_range(start=timestamp_start, end=timestamp_end, freq="B")
+
+# joining two time series
+data1 = pd.DataFrame(index=dr_daily, data={"ts_1": np.random.randn(len(dr_daily))})
+data2 = pd.DataFrame(index=dr_business_day, data={"ts_2": np.random.gamma(shape=1, scale=3,
+                                                                          size=len(dr_business_day))})
+data_mgd = pd.merge(left=data1, right=data2, left_index=True, right_index=True, how="left")
+print(data_mgd.isnull().sum(axis=0))
+data_mgd.fillna(method="ffill", inplace=True)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
-# yet another exercise...
+# pandas' groupby vs crosstab
+col1 = np.random.randn(10000)
+col2 = np.random.randn(10000)
+group_1 = np.random.choice(a=list(string.ascii_uppercase[0:20]), size=10000, replace=True)
+group_2 = np.random.choice(a=[str(el) for el in range(10)], size=10000, replace=True)
+df1 = pd.DataFrame(data={"var_X": col1, "var_Y": col2, "group1": group_2, "group2": group_1})
+df1.head()
 
+# grouping using groupby
+summ1 = df1.groupby(by=["group1", "group2"]).count()
+summ1.reset_index(drop=False, inplace=True)
+summ1.head()
+df1.pivot_table()
+summ2 = summ1.pivot_table(index="group2", values=["var_X", "var_Y"], columns="group1")
+
+# grouping using pandas' crosstab
+tab1 = pd.crosstab(index=df1.loc[:, "group2"], columns=df1.loc[:, "group1"],
+                   values=df1.loc[:, "var_X"], aggfunc=np.sum)
+# ----------------------------------------------------------------------------------------------------------------------
