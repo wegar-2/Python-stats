@@ -22,12 +22,13 @@ vec5 = np.random.randint(low=0, high=4, size=N)
 
 # 1.1. sampling
 
-# 1.1.1. sampling from a list in Python - using numpy
+# 1.1.1.1. sampling from a list in Python - the dumb way around
 my_letters = np.array(list(string.ascii_lowercase))
 my_letters = np.array(my_letters[0:10])
 vec2 = my_letters[list(vec2)]
 my_countries = np.array(["USA", "China", "Russia", "Japan", "Germany"])
-vec5 = my_countries[vec5]
+vec5 = my_countries[vec2]
+
 
 # 1.1.2. sampling using numpy's built-in function numpy.random.choice
 popul = ["a", "b", "c", "e", "f", "q"]
@@ -47,12 +48,19 @@ data1 = np.concatenate((vec2.reshape(N, 1), vec5.reshape(N,1), vec1.reshape(N, 1
 df2 = pd.DataFrame(data=data1, columns=["categ_A", "country", "var_X", "var_Y", "var_Z"])
 df2.head(3)
 
-# 1.2.3.
+# 1.2.3. putting string and numbers into numpy 2D array
+vec1 = np.random.randn(100)
+vec2 = np.random.choice(a=list(string.ascii_letters), replace=True, size=100)
+vec1 = vec1.reshape((100, 1))
+vec2 = vec2.reshape((100, 1))
+data2 = np.concatenate((vec1, vec2), axis=1)
+df_temp = pd.DataFrame(data=data2, columns=["numbers", "letters"])
+df_temp.loc[:, "numbers"] = df_temp.loc[:, "numbers"].astype(float)
+df_temp.head()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 2. performing analysis by a group
-
 
 # 2.1. default call
 df1_gpd = df1.groupby(by="categ_A")
@@ -82,6 +90,34 @@ nums = np.random.randint(low=1, high=11, size=100)
 # ----------------------------------------------------------------------------------------------------------------------
 # 3. performing analyses by multiple groups
 
+# 3.1. setting up a data frame with two grouping variables
+categ_1 = np.random.choice(a=list(string.ascii_letters[0:20].lower()), replace=True, size=1000).reshape(1000, 1)
+categ_2 = np.random.choice(a=[str(el) for el in range(7)], replace=True, size=1000).reshape(1000, 1)
+var_1 = np.random.gamma(shape=3, scale=2, size=1000).reshape(1000, 1)
+var_2 = np.random.randn(1000).reshape(1000, 1)
+data2 = np.concatenate((categ_1, categ_2, var_1, var_2), axis=1)
+df_temp = pd.DataFrame(data=data2, columns=["categ_1", "categ_2", "var_X", "var_Y"])
+df_temp.loc[:, "var_X"] = df_temp.loc[:, "var_X"].astype(float)
+df_temp.loc[:, "var_Y"] = df_temp.loc[:, "var_Y"].astype(float)
+print(df_temp.dtypes)
+print(df_temp.head())
+
+# 3.2. calculating counts in groups - the 'manual' approach
+df_temp_gpd = df_temp.loc[:, ["categ_1", "categ_2", "var_X"]].groupby(by=["categ_1", "categ_2"])
+counts_gpd = df_temp_gpd.count()
+counts_gpd.head()
+counts_gpd_2 = counts_gpd.reset_index(drop=False)
+counts_by_groups = pd.pivot_table(data=counts_gpd_2, values=["var_X"], index=["categ_1"], columns=["categ_2"])
+
+# 3.3. using pandas' crosstab
+tab_counts1 = pd.crosstab(index=df_temp.loc[:, "categ_1"], columns=df_temp.loc[:, "categ_2"])
+
+# 3.4. using groupby()
+tab_counts2 = df_temp.groupby(by=["categ_1", "categ_2"]).count()
+tab_counts2.reset_index(inplace=True, drop=False)
+print(tab_counts2.head())
+tab_counts2 = tab_counts2.pivot_table(index="categ_1", values="var_X",
+                                      columns="categ_2")
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 4. pandas' MultiIndexes
